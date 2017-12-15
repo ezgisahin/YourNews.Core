@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using YourNews.Admin.Models;
 using YourNews.Core.Data;
 using YourNews.Core.Models;
 
@@ -27,6 +28,7 @@ namespace YourNews.Admin.Controllers
         // GET: News
         public async Task<IActionResult> Index()
         {
+            Security.LoginCheck(HttpContext);
             var applicationDbContext = _context.News.Include(n => n.Category);
             return View(await applicationDbContext.ToListAsync());
         }
@@ -34,6 +36,7 @@ namespace YourNews.Admin.Controllers
         // GET: News/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            Security.LoginCheck(HttpContext);
             if (id == null)
             {
                 return NotFound();
@@ -53,6 +56,7 @@ namespace YourNews.Admin.Controllers
         // GET: News/Create
         public IActionResult Create()
         {
+            Security.LoginCheck(HttpContext);
             News n = new News();
             n.CreateDate = DateTime.Now;
             n.CreatedBy = User.Identity.Name;
@@ -71,6 +75,7 @@ namespace YourNews.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Description,Photo,PublishDate,IsPublished,CreateDate,CreatedBy,UpdateDate,UpdatedBy,CategoryId")] News news, IFormFile upload)
         {
+            Security.LoginCheck(HttpContext);
             //dosya uzantısı için geçerlilik denetimi
             if (upload != null && !IsExtensionValid(upload))
             {
@@ -112,6 +117,7 @@ namespace YourNews.Admin.Controllers
         // GET: News/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            Security.LoginCheck(HttpContext);
             if (id == null)
             {
                 return NotFound();
@@ -133,6 +139,7 @@ namespace YourNews.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Photo,PublishDate,IsPublished,CreateDate,CreatedBy,UpdateDate,UpdatedBy,CategoryId")] News news, IFormFile upload)
         {
+            Security.LoginCheck(HttpContext);
             if (id != news.Id)
             {
                 return NotFound();
@@ -185,6 +192,7 @@ namespace YourNews.Admin.Controllers
         // GET: News/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            Security.LoginCheck(HttpContext);
             if (id == null)
             {
                 return NotFound();
@@ -206,6 +214,7 @@ namespace YourNews.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            Security.LoginCheck(HttpContext);
             var news = await _context.News.SingleOrDefaultAsync(m => m.Id == id);
             _context.News.Remove(news);
             await _context.SaveChangesAsync();

@@ -38,7 +38,8 @@
                 <ul class="nav navbar-nav navbar-right">
                     @if (!string.IsNullOrEmpty(Context.Session.GetString("UserName")))
                     {
-                    <li><a asp-action="Edit" asp-controller="Users">Hoşgeldiniz @Context.Session.GetString("UserName")</a></li>
+                    <li><a asp-action="EditProfile" asp-controller="Users">Hoşgeldiniz @Context.Session.GetString("UserName")</a></li>
+                    <li><a href="#" onclick="document.getElementById('logoutForm').submit();">Çıkış</a><form id="logoutForm" asp-action="Logout" asp-controller="Users" method="post"></form></li>
                     }
                     else
                     {
@@ -46,6 +47,7 @@
                     <li><a asp-action="Create" asp-controller="Users">Kaydol</a></li>
                     }
                 </ul>
+                
             </div>
         </div>
     </nav>

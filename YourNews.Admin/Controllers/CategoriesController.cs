@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using YourNews.Admin.Models;
 using YourNews.Core.Data;
 using YourNews.Core.Models;
 
@@ -22,12 +23,14 @@ namespace YourNews.Admin.Controllers
         // GET: Categories
         public async Task<IActionResult> Index()
         {
+            Security.LoginCheck(HttpContext);
             return View(await _context.Categories.ToListAsync());
         }
 
         // GET: Categories/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            Security.LoginCheck(HttpContext);
             if (id == null)
             {
                 return NotFound();
@@ -46,6 +49,7 @@ namespace YourNews.Admin.Controllers
         // GET: Categories/Create
         public IActionResult Create()
         {
+            Security.LoginCheck(HttpContext);
             Category c = new Category();
             c.CreateDate = DateTime.Now;
             c.CreatedBy = User.Identity.Name;
@@ -61,6 +65,7 @@ namespace YourNews.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,CreateDate,CreatedBy,UpdateDate,UpdatedBy")] Category category)
         {
+            Security.LoginCheck(HttpContext);
             if (ModelState.IsValid)
             {
                 //formun alanlarını kullanmak için parametredeki category yi kullanıyoruz.
@@ -78,6 +83,7 @@ namespace YourNews.Admin.Controllers
         // GET: Categories/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            Security.LoginCheck(HttpContext);
             if (id == null)
             {
                 return NotFound();
@@ -98,6 +104,7 @@ namespace YourNews.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CreateDate,CreatedBy,UpdateDate,UpdatedBy")] Category category)
         {
+            Security.LoginCheck(HttpContext);
             if (id != category.Id)
             {
                 return NotFound();
@@ -131,6 +138,7 @@ namespace YourNews.Admin.Controllers
         // GET: Categories/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            Security.LoginCheck(HttpContext);
             if (id == null)
             {
                 return NotFound();
@@ -151,6 +159,7 @@ namespace YourNews.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            Security.LoginCheck(HttpContext);
             var category = await _context.Categories.SingleOrDefaultAsync(m => m.Id == id);
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();

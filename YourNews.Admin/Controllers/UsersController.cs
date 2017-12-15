@@ -46,15 +46,24 @@ namespace YourNews.Admin.Controllers
             return View(login);
         }
 
+        public IActionResult Logout()
+        {
+            Security.LoginCheck(HttpContext);
+            HttpContext.Session.SetString("UserName", "");
+            return RedirectToAction("Index","Home");
+        }
+
         // GET: Users
         public async Task<IActionResult> Index()
         {
+            Security.LoginCheck(HttpContext);
             return View(await _context.Users.ToListAsync());
         }
 
         // GET: Users/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            Security.LoginCheck(HttpContext);
             if (id == null)
             {
                 return NotFound();
@@ -73,6 +82,7 @@ namespace YourNews.Admin.Controllers
         // GET: Users/Create
         public IActionResult Create()
         {
+            //Security.LoginCheck(HttpContext);
             User u = new User();
             u.CreateDate = DateTime.Now;
             u.CreatedBy = User.Identity.Name;
@@ -88,6 +98,7 @@ namespace YourNews.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Email,Password,ConfirmPassword,CreateDate,CreatedBy,UpdateDate,UpdatedBy")] User user)
         {
+            //Security.LoginCheck(HttpContext);
             if (ModelState.IsValid)
             {
                 user.CreateDate = DateTime.Now;
@@ -95,21 +106,48 @@ namespace YourNews.Admin.Controllers
                 user.UpdateDate = DateTime.Now;
                 user.UpdatedBy = User.Identity.Name;
                 user.Password = Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(user.Password)));
-
-                _context.Add(user);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Add(user);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                //catch (ArgumentException ex)
+                //{
+                //    //argument hatası olursa burası çalışır
+                //}
+                catch (Exception ex)
+                {
+                    //herhangi bir hata olursa burası çalışır (argument dışındakiler)
+                    ModelState.AddModelError("Email", "Bu e-posta adresi daha önce kullanılmış.");
+                }
+                //finally
+                //{
+                //    //her zaman çalışır
+                //}
+                
             }
             return View(user);
         }
 
-        // GET: Users/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        //aktif oturumu olan kullanıcının düzenlenmesi
+        public async Task<IActionResult> EditProfile()
         {
-            if (id == null)
+            Security.LoginCheck(HttpContext);
+
+            var userName = HttpContext.Session.GetString("UserName");
+            var user = await _context.Users.FirstOrDefaultAsync(m => m.Email == userName);
+            if (user == null)
             {
                 return NotFound();
             }
+            return View("Edit",user);
+        }
+
+        // GET: Users/Edit/5
+        public async Task<IActionResult> Edit(int id)
+        {
+            Security.LoginCheck(HttpContext);
 
             var user = await _context.Users.SingleOrDefaultAsync(m => m.Id == id);
             if (user == null)
@@ -126,6 +164,7 @@ namespace YourNews.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Email,Password,ConfirmPassword,CreateDate,CreatedBy,UpdateDate,UpdatedBy")] User user)
         {
+            Security.LoginCheck(HttpContext);
             if (id != user.Id)
             {
                 return NotFound();
@@ -160,6 +199,7 @@ namespace YourNews.Admin.Controllers
         // GET: Users/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            Security.LoginCheck(HttpContext);
             if (id == null)
             {
                 return NotFound();
@@ -180,6 +220,7 @@ namespace YourNews.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            Security.LoginCheck(HttpContext);
             var user = await _context.Users.SingleOrDefaultAsync(m => m.Id == id);
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();

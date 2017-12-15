@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using YourNews.Admin.Models;
 
@@ -12,11 +13,13 @@ namespace YourNews.Admin.Controllers
     {
         public IActionResult Index()
         {
+            Security.LoginCheck(HttpContext);
             return View();
         }
 
         public IActionResult About()
         {
+            Security.LoginCheck(HttpContext);
             ViewData["Message"] = "Your application description page.";
 
             return View();
@@ -24,6 +27,7 @@ namespace YourNews.Admin.Controllers
 
         public IActionResult Contact()
         {
+            Security.LoginCheck(HttpContext);
             ViewData["Message"] = "Your contact page.";
 
             return View();
